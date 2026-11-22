@@ -90,10 +90,22 @@ public class RiderAssignmentApiApplicationTest {
         );
     }
 
+    @Test
+    @Order(5)
+    @DisplayName("should update assignment with id=1")
+    @Sql(statements = "INSERT INTO rider_assignments(id, delivery_id, rider_id, status, assigned_at) VALUES (1, 7001, 301, 'ASSIGNED', CURRENT_TIMESTAMP)", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(statements = "DELETE FROM rider_assignments", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    public void shouldUpdateAssignment() {
+        RiderAssignment updatedRequest = new RiderAssignment(1L, 7001L, 302L, AssignmentStatus.ACCEPTED, null);
+        restTemplate.put(baseUrl + "/{id}", updatedRequest, 1L);
 
-
-
-
+        RiderAssignment assignmentFromDB = testH2Repository.findById(1L).orElse(null);
+        assertAll(
+                () -> assertNotNull(assignmentFromDB),
+                () -> assertEquals(302L, assignmentFromDB.getRiderId()),
+                () -> assertEquals(AssignmentStatus.ACCEPTED, assignmentFromDB.getStatus())
+        );
+    }
 
 
 
