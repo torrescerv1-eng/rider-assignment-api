@@ -107,7 +107,17 @@ public class RiderAssignmentApiApplicationTest {
         );
     }
 
-
+    @Test
+    @Order(6)
+    @DisplayName("should delete assignment with id=1")
+    @Sql(statements = "INSERT INTO rider_assignments(id, delivery_id, rider_id, status, assigned_at) VALUES (1, 7001, 301, 'ASSIGNED', CURRENT_TIMESTAMP)", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(statements = "DELETE FROM rider_assignments", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    public void shouldDeleteAssignment() {
+        int recordCount = testH2Repository.findAll().size();
+        assertEquals(1, recordCount);
+        restTemplate.delete(baseUrl + "/{id}", 1L);
+        assertEquals(0, testH2Repository.findAll().size());
+    }
 
 
 
