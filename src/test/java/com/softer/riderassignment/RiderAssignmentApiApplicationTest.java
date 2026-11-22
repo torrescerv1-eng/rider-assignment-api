@@ -1,5 +1,6 @@
 package com.softer.riderassignment;
 
+import com.softer.riderassignment.model.AssignmentStatus;
 import com.softer.riderassignment.model.RiderAssignment;
 import com.softer.riderassignment.repository.TestH2Repository;
 import org.junit.jupiter.api.*;
@@ -60,6 +61,20 @@ public class RiderAssignmentApiApplicationTest {
         assertEquals(1, response.size());
         assertEquals(1, testH2Repository.findAll().size());
     }
+
+    @Test
+    @Order(3)
+    @DisplayName("should register a new assignment")
+    @Sql(statements = "DELETE FROM rider_assignments", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    public void shouldAddAssignment() {
+        RiderAssignment assignment = new RiderAssignment(null, 7001L, 301L, AssignmentStatus.ASSIGNED, null);
+        RiderAssignment response = restTemplate.postForObject(baseUrl, assignment, RiderAssignment.class);
+        assertNotNull(response);
+        assertEquals(7001L, response.getDeliveryId());
+        assertEquals(AssignmentStatus.ASSIGNED, response.getStatus());
+        assertEquals(1, testH2Repository.findAll().size());
+    }
+
 
 
 
